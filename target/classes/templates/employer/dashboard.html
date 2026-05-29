@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(~{::title})}">
+    <title>Employer Dashboard - CareerMatch</title>
+</head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="dashboard-wrapper container">
+        <aside class="sidebar">
+            <div class="widget">
+                <a href="/employer/post-job" class="btn-primary btn-full">+ Post New Job</a>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" th:text="${#lists.size(jobs)}">0</div>
+                <div class="stat-label">Active Jobs Created</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" th:text="${pendingCount}">0</div>
+                <div class="stat-label">Pending Applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" th:text="${acceptedCount}">0</div>
+                <div class="stat-label">Shortlisted Candidates</div>
+            </div>
+        </aside>
+
+        <main class="dashboard-content">
+            <div th:if="${param.success}" class="alert alert-success">
+                Job posted successfully!
+            </div>
+            
+            <div class="dashboard-header flex-between">
+                <h2>Recent Applications</h2>
+                <input type="text" id="appFilter" placeholder="Filter by job or applicant..." class="filter-input" onkeyup="filterTable()">
+            </div>
+
+            <div class="applications-table-wrapper">
+                <table class="data-table" id="applicationsTable">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Job Title</th>
+                            <th>Resume</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="app : ${applications}">
+                            <td>
+                                <strong th:text="${app.applicant.name}">Name</strong>
+                                <div class="text-small" th:if="${app.applicant.employmentStatus}" 
+                                     th:text="${#strings.replace(app.applicant.employmentStatus.name(), '_', ' ')}">Worker</div>
+                            </td>
+                            <td class="job-title-col">
+                                <span th:text="${app.job.title}">Title</span>
+                            </td>
+                            <td>
+                                <a th:href="@{'/files/' + ${app.resumeFilePath}}" target="_blank" class="btn-text">📄 View PDF</a>
+                            </td>
+                            <td>
+                                <span th:class="'status-' + ${#strings.toLowerCase(app.status)}" th:text="${app.status}">Status</span>
+                            </td>
+                            <td class="action-cell">
+                                <div class="action-buttons" th:if="${app.status.name() == 'PENDING' || app.status.name() == 'REJECTED'}">
+                                    <a th:href="@{'/employer/applications/' + ${app.id} + '/status?status=ACCEPTED'}" class="btn-small success">Accept</a>
+                                </div>
+                                <div class="action-buttons" th:if="${app.status.name() == 'PENDING' || app.status.name() == 'ACCEPTED'}">
+                                    <a th:href="@{'/employer/applications/' + ${app.id} + '/status?status=REJECTED'}" class="btn-small danger">Reject</a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(applications)}">
+                            <td colspan="5" class="text-center">No applications received yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 class="mt-4">My Posted Jobs</h2>
+            <div class="job-grid mt-2">
+                <div th:each="job : ${jobs}" class="job-card simple-card">
+                    <h3 th:text="${job.title}">Job Title</h3>
+                    <p class="text-muted" th:text="${job.category}">Category</p>
+                    <div class="mt-2">
+                        <span class="badge" th:text="${#lists.size(job.applications)} + ' Applicants'">0 Applicants</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function filterTable() {
+            var input = document.getElementById("appFilter");
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById("applicationsTable");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) {
+                var txtValue = tr[i].textContent || tr[i].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

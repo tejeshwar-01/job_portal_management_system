@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:replace="${title}">Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav th:fragment="navbar" class="navbar">
+        <div class="container nav-content">
+            <a href="/" class="logo">Career<span>Match</span></a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                
+                <!-- Unauthenticated Options -->
+                <div sec:authorize="!isAuthenticated()" class="auth-links">
+                    <a href="/login" class="btn-text">Log In</a>
+                    <a href="/register" class="btn-primary">Sign Up</a>
+                </div>
+                
+                <!-- Authenticated Options -->
+                <div sec:authorize="isAuthenticated()" class="auth-links">
+                    <a sec:authorize="hasRole('EMPLOYER')" href="/employer/dashboard">Employer Dashboard</a>
+                    <a sec:authorize="hasRole('STUDENT')" href="/student/dashboard">Applicant Dashboard</a>
+                    <form th:action="@{/logout}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-text">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>

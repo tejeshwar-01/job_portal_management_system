@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head(~{::title})}">
+    <title>Post Job - CareerMatch</title>
+</head>
+<body class="bg-light">
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <div class="container form-container">
+        <div class="card premium-card">
+            <h2>Post a New Job</h2>
+            <p class="subtitle mt-1 mb-3">Fill out the details below to attract top talent.</p>
+
+            <form th:action="@{/employer/post-job}" th:object="${job}" method="POST">
+                <div class="form-group row">
+                    <div class="col">
+                        <label for="title">Job Title</label>
+                        <input type="text" id="title" th:field="*{title}" required placeholder="e.g. Senior Java Developer">
+                    </div>
+                    <div class="col">
+                        <label for="category">Category</label>
+                        <select id="category" th:field="*{category}" required>
+                            <option value="">Select Category...</option>
+                            <option value="IT & Software">IT & Software</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Design">Design</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Job Description</label>
+                    <textarea id="description" th:field="*{description}" rows="5" required placeholder="Describe the role and responsibilities..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="skillsRequired">Skills Required</label>
+                    <input type="text" id="skillsRequired" th:field="*{skillsRequired}" required placeholder="e.g. Java, Spring Boot, MySQL (comma separated)">
+                </div>
+
+                <div class="form-group row">
+                    <div class="col">
+                        <label for="salary">Salary Range</label>
+                        <input type="text" id="salary" th:field="*{salary}" placeholder="e.g. $80k - $120k">
+                    </div>
+                    <div class="col">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" th:field="*{location}" required placeholder="e.g. New York, NY (or Remote)">
+                    </div>
+                </div>
+
+                <div class="form-actions mt-3">
+                    <a href="/employer/dashboard" class="btn-secondary">Cancel</a>
+                    <button type="submit" class="btn-primary">Post Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

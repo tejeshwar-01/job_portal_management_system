@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout :: head(~{::title})}">
+    <title>CareerMatch - Find Your Dream Job</title>
+</head>
+<body>
+    <nav th:replace="~{layout :: navbar}"></nav>
+
+    <header class="hero">
+        <div class="container hero-content">
+            <h1>Discover your next great opportunity</h1>
+            <p>Connect with top employers and find the job that fits your skills and passion.</p>
+            <div class="search-bar">
+                <form action="/" method="GET">
+                    <input type="text" name="search" placeholder="Search by job title or category..." th:value="${param.search}">
+                    <button type="submit" class="btn-primary">Search Jobs</button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- URL Param errors -->
+        <div th:if="${param.error}" class="alert alert-danger" style="margin-top:20px;">
+            <p th:if="${param.error[0] == 'already_applied'}">You have already applied for this job.</p>
+            <p th:if="${param.error[0] == 'empty_file'}">Please select a valid PDF file before clicking apply.</p>
+        </div>
+        
+        <!-- Flash Attribute errors -->
+        <div th:if="${error}" class="alert alert-danger" style="margin-top:20px;">
+            <p th:text="${error}"></p>
+        </div>
+    
+        <h2 class="section-title">Latest Openings</h2>
+        <div class="job-grid">
+            <div th:each="job : ${jobs}" class="job-card">
+                <h3 th:text="${job.title}">Job Title</h3>
+                <div class="job-meta">
+                    <span class="badge" th:text="${job.category}">Category</span>
+                    <span class="location" th:text="${job.location}">Location</span>
+                </div>
+                <p class="company">Posted by <strong th:text="${job.employer.name}">Employer Name</strong></p>
+                <div class="tags">
+                    <span th:each="skill : ${#strings.arraySplit(job.skillsRequired, ',')}" 
+                          class="skill-tag" th:text="${skill.trim()}">Skill</span>
+                </div>
+                <div class="salary" th:text="${job.salary}">$0 - $0</div>
+                
+                <div class="apply-section" sec:authorize="hasRole('STUDENT')">
+                    <form th:action="@{/student/apply/{id}(id=${job.id})}" method="POST" enctype="multipart/form-data">
+                        <input type="file" name="file" accept=".pdf" required class="file-input">
+                        <button type="submit" class="btn-primary btn-full">Apply Now</button>
+                    </form>
+                </div>
+                <div class="apply-section" sec:authorize="!isAuthenticated()">
+                    <a href="/login" class="btn-secondary btn-full">Login to Apply</a>
+                </div>
+            </div>
+            <div th:if="${#lists.isEmpty(jobs)}" class="empty-state">
+                <p>No jobs found matching your criteria.</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
